@@ -614,8 +614,14 @@ body.nav-active { overflow: hidden; }
 
 .header.active {
   padding-block: 20px;
-  background-color: var(--eerie-black-4);
-  border-color: var(--black-alpha-15);
+  background: rgba(10, 10, 10, 0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-block: 14px;
+  transition: 0.4s ease;
+
+
 }
 
 .header.hide {

@@ -197,6 +197,39 @@ body.nav-active { overflow: hidden; }
 ::-webkit-scrollbar-thumb { background-color: var(--gold-crayola); }
 
 
+/* Smooth scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: 0.8s ease;
+  
+}
+
+
+.reveal.show {
+  opacity: 1;
+  transform: translateY(0);
+  transition: 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Header shadow while scrolling */
+.header.active {
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  backdrop-filter: blur(12px);
+}
+
+/* Menu card hover smooth */
+.menu-card {
+  transition: transform 0.35s ease;
+}
+
+.menu-card:hover {
+  transform: translateY(-6px) scale(1.03);
+}
+
+[data-delay] {
+  transition-delay: var(--delay, 0s);
+}
 
 
 
@@ -614,8 +647,14 @@ body.nav-active { overflow: hidden; }
 
 .header.active {
   padding-block: 20px;
-  background-color: var(--eerie-black-4);
-  border-color: var(--black-alpha-15);
+  background: rgba(10, 10, 10, 0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-block: 14px;
+  transition: 0.4s ease;
+
+
 }
 
 .header.hide {
@@ -1009,16 +1048,43 @@ body.nav-active { overflow: hidden; }
   #SPECIAL DISH
 \*-----------------------------------*/
 
-.special-dish-content { padding-block: 70px; }
+.special-dish-content { padding-block: 70px; 
+    
+ }
+.special-dish-banner {
+  position: relative;
+  overflow: hidden;
+}
+
+.special-dish-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Upar darker, niche normal */
+.special-dish-banner::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 65%; /* top part amount */
+  background: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0.10));
+  pointer-events: none;
+}
+
 
 .special-dish .abs-img {
   margin-inline: auto;
   margin-block-end: 12px;
 }
 
-.special-dish .section-text { margin-block: 16px 40px; }
+.special-dish .section-text { margin-block: 16px 40px; 
+}
 
 .special-dish-content .wrapper {
+    
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1045,7 +1111,7 @@ body.nav-active { overflow: hidden; }
 
 .menu .section-title {
     margin-block-end: 40px;
-  padding-top: 100px;
+ 
  }
 
 .menu .grid-list { margin-block-end: 50px; }

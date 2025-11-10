@@ -1,170 +1,137 @@
 'use strict';
 
-
-
-/**
- * PRELOAD
- * 
- * loading will be end after document is loaded
- */
-
+/*---------------------------
+  PRELOADER
+---------------------------*/
 const preloader = document.querySelector("[data-preaload]");
 
-window.addEventListener("load", function () {
-  preloader.classList.add("loaded");
+window.addEventListener("load", () => {
+  preloader?.classList.add("loaded");
   document.body.classList.add("loaded");
 });
 
+/* Utility - Add event on multiple elements */
+const addEvent = (elements, event, handler) =>
+  elements.forEach(el => el.addEventListener(event, handler));
 
 
-/**
- * add event listener on multiple elements
- */
-
-const addEventOnElements = function (elements, eventType, callback) {
-  for (let i = 0, len = elements.length; i < len; i++) {
-    elements[i].addEventListener(eventType, callback);
-  }
-}
-
-
-
-/**
- * NAVBAR
- */
-
+/*---------------------------
+  NAVBAR
+---------------------------*/
 const navbar = document.querySelector("[data-navbar]");
 const navTogglers = document.querySelectorAll("[data-nav-toggler]");
 const overlay = document.querySelector("[data-overlay]");
 
-const toggleNavbar = function () {
+const toggleNavbar = () => {
   navbar.classList.toggle("active");
   overlay.classList.toggle("active");
   document.body.classList.toggle("nav-active");
-}
+};
 
-addEventOnElements(navTogglers, "click", toggleNavbar);
+addEvent(navTogglers, "click", toggleNavbar);
 
 
-
-/**
- * HEADER & BACK TOP BTN
- */
-
+/*---------------------------
+  HEADER + BACK TO TOP
+---------------------------*/
 const header = document.querySelector("[data-header]");
 const backTopBtn = document.querySelector("[data-back-top-btn]");
 
 let lastScrollPos = 0;
 
-const hideHeader = function () {
-  const isScrollBottom = lastScrollPos < window.scrollY;
-  if (isScrollBottom) {
-    header.classList.add("hide");
-  } else {
-    header.classList.remove("hide");
-  }
+const updateHeader = () => {
+  const currentScroll = window.scrollY;
 
-  lastScrollPos = window.scrollY;
-}
-
-window.addEventListener("scroll", function () {
-  if (window.scrollY >= 50) {
+  if (currentScroll > 50) {
     header.classList.add("active");
-    backTopBtn.classList.add("active");
-    hideHeader();
+    backTopBtn?.classList.add("active");
   } else {
     header.classList.remove("active");
-    backTopBtn.classList.remove("active");
+    backTopBtn?.classList.remove("active");
   }
+
+  header.classList.toggle("hide", currentScroll > lastScrollPos && currentScroll > 50);
+
+  lastScrollPos = currentScroll;
+};
+
+window.addEventListener("scroll", updateHeader);
+
+
+/*---------------------------
+  HERO SLIDER
+---------------------------*/
+const slides = document.querySelectorAll("[data-hero-slider-item]");
+const nextBtn = document.querySelector("[data-next-btn]");
+const prevBtn = document.querySelector("[data-prev-btn]");
+
+let index = 0;
+let autoSlideInterval = null;
+
+const showSlide = (i) => {
+  slides.forEach(s => s.classList.remove("active"));
+  slides[i].classList.add("active");
+};
+
+const nextSlide = () => {
+  index = (index + 1) % slides.length;
+  showSlide(index);
+};
+
+const prevSlide = () => {
+  index = (index - 1 + slides.length) % slides.length;
+  showSlide(index);
+};
+
+nextBtn?.addEventListener("click", nextSlide);
+prevBtn?.addEventListener("click", prevSlide);
+
+const startAutoSlide = () => autoSlideInterval = setInterval(nextSlide, 7000);
+const stopAutoSlide = () => clearInterval(autoSlideInterval);
+
+[nextBtn, prevBtn].forEach(btn => {
+  btn?.addEventListener("mouseover", stopAutoSlide);
+  btn?.addEventListener("mouseout", startAutoSlide);
 });
 
+window.addEventListener("load", startAutoSlide);
 
 
-/**
- * HERO SLIDER
- */
-
-const heroSlider = document.querySelector("[data-hero-slider]");
-const heroSliderItems = document.querySelectorAll("[data-hero-slider-item]");
-const heroSliderPrevBtn = document.querySelector("[data-prev-btn]");
-const heroSliderNextBtn = document.querySelector("[data-next-btn]");
-
-let currentSlidePos = 0;
-let lastActiveSliderItem = heroSliderItems[0];
-
-const updateSliderPos = function () {
-  lastActiveSliderItem.classList.remove("active");
-  heroSliderItems[currentSlidePos].classList.add("active");
-  lastActiveSliderItem = heroSliderItems[currentSlidePos];
-}
-
-const slideNext = function () {
-  if (currentSlidePos >= heroSliderItems.length - 1) {
-    currentSlidePos = 0;
-  } else {
-    currentSlidePos++;
-  }
-
-  updateSliderPos();
-}
-
-heroSliderNextBtn.addEventListener("click", slideNext);
-
-const slidePrev = function () {
-  if (currentSlidePos <= 0) {
-    currentSlidePos = heroSliderItems.length - 1;
-  } else {
-    currentSlidePos--;
-  }
-
-  updateSliderPos();
-}
-
-heroSliderPrevBtn.addEventListener("click", slidePrev);
-
-/**
- * auto slide
- */
-
-let autoSlideInterval;
-
-const autoSlide = function () {
-  autoSlideInterval = setInterval(function () {
-    slideNext();
-  }, 7000);
-}
-
-addEventOnElements([heroSliderNextBtn, heroSliderPrevBtn], "mouseover", function () {
-  clearInterval(autoSlideInterval);
-});
-
-addEventOnElements([heroSliderNextBtn, heroSliderPrevBtn], "mouseout", autoSlide);
-
-window.addEventListener("load", autoSlide);
-
-
-
-/**
- * PARALLAX EFFECT
- */
-
+/*---------------------------
+  PARALLAX EFFECT
+---------------------------*/
 const parallaxItems = document.querySelectorAll("[data-parallax-item]");
 
-let x, y;
+window.addEventListener("mousemove", ({ clientX, clientY }) => {
+  const xPercent = (clientX / window.innerWidth - 0.5) * -20;
+  const yPercent = (clientY / window.innerHeight - 0.5) * -20;
 
-window.addEventListener("mousemove", function (event) {
-
-  x = (event.clientX / window.innerWidth * 10) - 5;
-  y = (event.clientY / window.innerHeight * 10) - 5;
-
-  // reverse the number eg. 20 -> -20, -5 -> 5
-  x = x - (x * 2);
-  y = y - (y * 2);
-
-  for (let i = 0, len = parallaxItems.length; i < len; i++) {
-    x = x * Number(parallaxItems[i].dataset.parallaxSpeed);
-    y = y * Number(parallaxItems[i].dataset.parallaxSpeed);
-    parallaxItems[i].style.transform = `translate3d(${x}px, ${y}px, 0px)`;
-  }
-
+  parallaxItems.forEach(item => {
+    const speed = Number(item.dataset.parallaxSpeed);
+    item.style.transform = `translate3d(${xPercent * speed}px, ${yPercent * speed}px, 0)`;
+  });
 });
+
+
+/*=====================
+  SCROLL + STAGGER REVEAL
+=====================*/
+
+const revealElements = document.querySelectorAll(".reveal");
+
+const revealOnScroll = () => {
+  revealElements.forEach((el, index) => {
+    const triggerPoint = window.innerHeight - 100;
+    const elementTop = el.getBoundingClientRect().top;
+
+    if (elementTop < triggerPoint) {
+      // Set stagger delay automatically
+      el.style.setProperty("--delay", `${index * 0.15}s`);
+      el.classList.add("show");
+    }
+  });
+};
+
+window.addEventListener("scroll", revealOnScroll);
+revealOnScroll();
+
